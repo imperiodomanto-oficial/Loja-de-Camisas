@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Império do Manto | Loja Oficial</title>
+    <title>Império do Manto | Camisas Tailandesas 1:1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -11,9 +11,12 @@
         .site-container { background-color: #f3f3f3; max-width: 500px; margin: 0 auto; min-height: 100vh; position: relative; padding-bottom: 20px; }
         .banner-header { width: 100%; height: 130px; overflow: hidden; position: relative; background-color: #000; }
         .banner-img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.2); object-position: center; }
-        .carousel { position: relative; width: 100%; height: 350px; overflow: hidden; }
+        
+        /* Ajuste na altura do carrossel para melhor enquadramento mobile */
+        .carousel { position: relative; width: 100%; height: 350px; overflow: hidden; background-color: #000; }
         .carousel-item { display: none; width: 100%; height: 100%; object-fit: cover; }
         .carousel-item.active { display: block; }
+        
         .card-artilheiro { background-color: #fff; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; align-items: center; padding-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .price-main { color: #333; font-size: 1.2rem; font-weight: 800; }
         .atacado-box { border-top: 1px solid #d4af37; border-bottom: 1px solid #d4af37; width: 90%; margin: 5px 0; text-align: center; padding: 2px 0; }
@@ -37,9 +40,9 @@
     </header>
 
     <div class="carousel">
-        <img src="banner1.jpg" class="carousel-item active">
-        <img src="banner2.jpg" class="carousel-item">
-        <img src="banner3.jpg" class="carousel-item">
+        <img src="banner1.jpg" class="carousel-item active" alt="Promoção 1">
+        <img src="banner2.jpg" class="carousel-item" alt="Promoção 2">
+        <img src="banner3.jpg" class="carousel-item" alt="Promoção 3">
         <button onclick="moveSlide(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full text-xs">❮</button>
         <button onclick="moveSlide(1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full text-xs">❯</button>
     </div>
@@ -75,6 +78,7 @@
 </div>
 
 <script>
+    // Seus scripts originais permanecem aqui...
     const linkPlanilha = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR0m7HN1ePfdwVgr0aaFfYjjFv6r1zag8fZ4x5Ih8XKPLjEIe97nRHqU-hWKWfBEksbOH5Mw8u2Y6VZ/pub?output=csv";
     const urlScriptGoogle = "https://script.google.com/macros/s/AKfycbwe4-Fw5VEuCew9ow6YNuUB7vWner3dU18qPfu_gH7ReLB1FnTFIZ3U_HLodpv1_JCv/exec";
 
@@ -231,7 +235,6 @@
         if (carrinho.length === 0) return;
         const btn = document.getElementById('btn-finalizar');
 
-        // 1. Débito no estoque (Google Sheets)
         try {
             btn.innerText = "PROCESSANDO ESTOQUE...";
             btn.disabled = true;
@@ -245,7 +248,6 @@
             console.error("Erro ao debitar:", error);
         }
 
-        // 2. Preparar Mensagem
         let totalGeral = carrinho.reduce((sum, item) => sum + (item.preco * item.qtd), 0);
         let msg = "🚀 *NOVO PEDIDO - IMPÉRIO DO MANTO*\n\n";
         carrinho.forEach((item, i) => {
@@ -255,17 +257,14 @@
         });
         msg += `🔥 *TOTAL: R$ ${totalGeral.toFixed(2)}*`;
         
-        // 3. Abre o WhatsApp em nova aba
         window.open(`https://wa.me/5521986285970?text=${encodeURIComponent(msg)}`, '_blank');
         
-        // 4. Reseta o site e recarrega estoque sem F5
         carrinho = [];
         atualizarContador();
         toggleCart();
         btn.innerText = "Finalizar no WhatsApp";
         btn.disabled = false;
 
-        // Aguarda 1.5s para o Google processar e atualiza a vitrine
         setTimeout(carregarProdutos, 1500);
     }
 
