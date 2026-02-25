@@ -76,8 +76,6 @@
 
 <script>
     const linkPlanilha = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR0m7HN1ePfdwVgr0aaFfYjjFv6r1zag8fZ4x5Ih8XKPLjEIe97nRHqU-hWKWfBEksbOH5Mw8u2Y6VZ/pub?output=csv";
-    
-    // ATENÇÃO: COLOQUE SUA URL DO GOOGLE APPS SCRIPT AQUI ABAIXO
     const urlScriptGoogle = "https://script.google.com/macros/s/AKfycbwe4-Fw5VEuCew9ow6YNuUB7vWner3dU18qPfu_gH7ReLB1FnTFIZ3U_HLodpv1_JCv/exec";
 
     let produtosData = [];
@@ -247,7 +245,7 @@
             console.error("Erro ao debitar:", error);
         }
 
-        // 2. Envio WhatsApp
+        // 2. Preparar Mensagem
         let totalGeral = carrinho.reduce((sum, item) => sum + (item.preco * item.qtd), 0);
         let msg = "🚀 *NOVO PEDIDO - IMPÉRIO DO MANTO*\n\n";
         carrinho.forEach((item, i) => {
@@ -257,14 +255,18 @@
         });
         msg += `🔥 *TOTAL: R$ ${totalGeral.toFixed(2)}*`;
         
-        window.location.href = `https://wa.me/5521986285970?text=${encodeURIComponent(msg)}`;
+        // 3. Abre o WhatsApp em nova aba
+        window.open(`https://wa.me/5521986285970?text=${encodeURIComponent(msg)}`, '_blank');
         
-        // Limpar carrinho após finalizar
+        // 4. Reseta o site e recarrega estoque sem F5
         carrinho = [];
         atualizarContador();
         toggleCart();
         btn.innerText = "Finalizar no WhatsApp";
         btn.disabled = false;
+
+        // Aguarda 1.5s para o Google processar e atualiza a vitrine
+        setTimeout(carregarProdutos, 1500);
     }
 
     carregarProdutos();
