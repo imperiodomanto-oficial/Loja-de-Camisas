@@ -75,14 +75,11 @@
             <div id="cart-items-list" class="flex-1 overflow-y-auto p-4 space-y-6"></div>
 
             <div class="p-4 bg-gray-100 border-t border-b">
-                <label class="text-[10px] font-bold uppercase text-gray-500 mb-1 block">Calcular Frete:</label>
+                <label class="text-[10px] font-bold uppercase text-gray-500 mb-1 block">Valor do Frete Combinado (R$):</label>
                 <div class="flex gap-2">
-                    <input type="text" id="cep-destino" placeholder="00000-000" class="cep-input" maxlength="9">
-                    <button id="btn-calc-frete" onclick="calcularFreteManual()" class="bg-black text-white px-4 rounded text-xs font-bold uppercase">Calcular</button>
+                    <input type="number" id="frete-manual-input" placeholder="Ex: 25.00" class="cep-input" oninput="atualizarValorFrete()">
                 </div>
-                <div id="resultado-frete" class="mt-2 hidden">
-                    <p class="text-[11px] font-bold text-green-700" id="info-frete"></p>
-                </div>
+                <p class="text-[9px] text-gray-400 mt-1">*Digite o valor para atualizar o total.</p>
             </div>
 
             <div class="p-4 bg-gray-50">
@@ -165,56 +162,17 @@
         });
     }
 
-    // NOVA FUNÇÃO DE FRETE MANUAL POR REGIÕES [cite: 2026-02-21]
-    function calcularFreteManual() {
-        const cepInput = document.getElementById('cep-destino').value.replace(/\D/g, '');
-        const btn = document.getElementById('btn-calc-frete');
-        const infoFrete = document.getElementById('info-frete');
-        const resultadoDiv = document.getElementById('resultado-frete');
+    // NOVA FUNÇÃO DE FRETE MANUAL [cite: 2026-03-01]
+    function atualizarValorFrete() {
+        const inputFrete = document.getElementById('frete-manual-input');
+        const valorDigitado = parseFloat(inputFrete.value);
 
-        if (cepInput.length !== 8) {
-            alert("Por favor, digite um CEP válido com 8 números.");
-            return;
+        if (!isNaN(valorDigitado) && valorDigitado >= 0) {
+            valorFreteGlobal = valorDigitado;
+        } else {
+            valorFreteGlobal = 0;
         }
-
-        if (carrinho.length === 0) {
-            alert("Adicione itens ao carrinho primeiro.");
-            return;
-        }
-
-        btn.innerText = "Calculando...";
-        btn.disabled = true;
-
-        const prefixo = parseInt(cepInput.substring(0, 2));
-        
-        let valor = 35.00; // Valor padrão para segurança [cite: 2026-02-21]
-        let prazo = "8 a 12";
-        let regiaoNome = "Envio Nacional";
-
-        // Lógica de Frete por Regiões baseada no seu CEP de origem
-        if (prefixo >= 20 && prefixo <= 28) { 
-            valor = 15.00; prazo = "2 a 5"; regiaoNome = "Rio de Janeiro (Local)"; 
-        } else if (prefixo <= 19 || (prefixo >= 29 && prefixo <= 39)) {
-            valor = 22.00; prazo = "4 a 7"; regiaoNome = "Sudeste (SP, MG, ES)"; 
-        } else if (prefixo >= 40 && prefixo <= 65) {
-            valor = 70.00; prazo = "9 a 14"; regiaoNome = "Nordeste"; 
-        } else if (prefixo >= 66 && prefixo <= 69) {
-            valor = 48.00; prazo = "12 a 20"; regiaoNome = "Norte (AM/PA)"; 
-        } else if (prefixo >= 70 && prefixo <= 99) {
-            valor = 29.00; prazo = "7 a 10"; regiaoNome = "Sul / Centro-Oeste"; 
-        }
-
-        // Simulação de carregamento rápido [cite: 2026-02-21]
-        setTimeout(() => {
-            valorFreteGlobal = valor;
-            resultadoDiv.classList.remove('hidden');
-            infoFrete.innerText = `🚚 ${regiaoNome}: R$ ${valor.toFixed(2)} (${prazo} dias úteis)`;
-            
-            renderizarCarrinho(); // Atualiza os totais no carrinho [cite: 2026-02-21]
-            
-            btn.innerText = "Calcular";
-            btn.disabled = false;
-        }, 800);
+        renderizarCarrinho();
     }
 
     function renderizarCarrinho() {
@@ -283,12 +241,19 @@
         let totalPix = (subtotal * 0.9) + valorFreteGlobal;
         
         let msg = "🚀 *NOVO PEDIDO - BRAZUKA 1.1*\n\n";
-        carrinho.forEach((item, i) => msg += `*${i+1}.* ${item.nome} (TAM: ${item.tamanho} | Qtd: ${item.qtd})\n`);
+        msg += "--- *ITENS* ---\n";
+        carrinho.forEach((item, i) => msg += `✅ ${item.qtd}x ${item.nome} (TAM: ${item.tamanho})\n`);
+        
+        msg += `\n--- *VALORES* ---`;
         msg += `\n💰 Subtotal: R$ ${subtotal.toFixed(2)}`;
-        msg += `\n🚚 Frete: R$ ${valorFreteGlobal.toFixed(2)}`;
-        msg += `\n⚡ *Total: R$ ${totalFinal.toFixed(2)}*`;
+        msg += `\n🚚 Frete Combinado: R$ ${valorFreteGlobal.toFixed(2)}`;
+        msg += `\n⚡ *TOTAL: R$ ${totalFinal.toFixed(2)}*`;
         msg += `\n\n🔥 *PAGANDO NO PIX (10% OFF): R$ ${totalPix.toFixed(2)}*`;
         
+        if (valorFreteGlobal === 0) {
+            msg += `\n\n⚠️ _Aguardando cálculo final do frete._`;
+        }
+
         window.open(`https://wa.me/5521986285970?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
