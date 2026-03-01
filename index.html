@@ -195,14 +195,11 @@
                 body: JSON.stringify({ to: cepDestino, weight: pesoTotal })
             });
 
-            const text = await response.text();
-            let data;
-            
-            try {
-                data = JSON.parse(text);
-            } catch(e) {
-                console.error("Resposta não-JSON:", text);
-                alert("O servidor de frete enviou uma resposta inválida. Verifique o Worker.");
+            const data = await response.json();
+
+            // EXIBE O ERRO REAL DA API SUPERFRETE (Útil para diagnóstico no celular) [cite: 2026-02-21]
+            if (data.error || data.message) {
+                alert("ERRO REAL: " + (data.message || data.error)); // [cite: 2026-02-21]
                 return;
             }
 
@@ -216,12 +213,12 @@
                 infoFrete.innerText = `🚚 ${opcao.name}: R$ ${valorFreteGlobal.toFixed(2)} (${prazo} dias)`;
                 renderizarCarrinho();
             } else {
-                alert("Não foi possível calcular o frete para este CEP.");
+                // Caso a API responda mas não traga serviços válidos [cite: 2026-02-21]
+                alert("API respondeu mas sem preços. Detalhe: " + JSON.stringify(data)); // [cite: 2026-02-21]
             }
 
         } catch (e) {
-            console.error("Erro Fetch:", e);
-            alert("Erro na conexão com o sistema de frete.");
+            alert("Erro de conexão: " + e.message); // [cite: 2026-02-21]
         } finally {
             btn.innerText = "Calcular";
             btn.disabled = false;
