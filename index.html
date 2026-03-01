@@ -124,14 +124,17 @@
                     <span>TOTAL:</span>
                     <span id="cart-total-value">R$ 0,00</span>
                 </div>
-                <button onclick="enviarWhatsApp()" class="w-full bg-[#28a745] text-white py-4 rounded font-black uppercase text-sm shadow-lg">Finalizar Pedido</button>
+                <button id="btn-finalizar" onclick="enviarWhatsApp()" class="w-full bg-[#28a745] text-white py-4 rounded font-black uppercase text-sm shadow-lg">Finalizar Pedido</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+    // URL DO SEU GOOGLE APPS SCRIPT
+    const URL_SCRIPT_ESTOQUE = "COLOQUE_AQUI_O_URL_DO_SEU_SCRIPT";
     const linkPlanilha = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR0m7HN1ePfdwVgr0aaFfYjjFv6r1zag8fZ4x5Ih8XKPLjEIe97nRHqU-hWKWfBEksbOH5Mw8u2Y6VZ/pub?output=csv";
+    
     let produtosData = [], carrinho = [], selecoesTemporarias = {};
 
     function toggleMenu() {
@@ -160,7 +163,7 @@
                     atacado: parseFloat(c[3]), 
                     imagem: c[4].trim(),
                     estoque: { P: parseInt(c[5])||0, M: parseInt(c[6])||0, G: parseInt(c[7])||0, GG: parseInt(c[8])||0 },
-                    categoria: c[9] ? c[9].trim().toLowerCase() : "todos" // Nova coluna J
+                    categoria: c[9] ? c[9].trim().toLowerCase() : "todos"
                 };
                 produtosData.push(p);
                 
@@ -184,7 +187,6 @@
         } catch (e) { console.error("Erro ao carregar planilha", e); }
     }
 
-    // Filtra pela digitação no campo de busca
     function buscarNoGrid() {
         const termo = document.getElementById('input-busca').value.toLowerCase();
         document.querySelectorAll('.item-produto').forEach(p => {
@@ -192,22 +194,15 @@
         });
     }
 
-    // Filtra clicando no menu lateral
     function filtrarProdutos(cat) {
         toggleMenu();
         const titulo = document.getElementById('titulo-secao');
         const busca = document.getElementById('input-busca');
-        
-        busca.value = ""; // Limpa a busca ao trocar de categoria
+        busca.value = "";
         titulo.innerText = cat === 'todos' ? "Lançamentos" : cat.replace(/-/g, ' ').toUpperCase();
-
         document.querySelectorAll('.item-produto').forEach(p => {
             const pCat = p.getAttribute('data-cat');
-            if(cat === 'todos' || pCat === cat) {
-                p.style.display = "flex";
-            } else {
-                p.style.display = "none";
-            }
+            p.style.display = (cat === 'todos' || pCat === cat) ? "flex" : "none";
         });
     }
 
@@ -242,7 +237,7 @@
             totalF += precoU * item.qtd;
             totalV += item.precoVarejo * item.qtd;
             lista.innerHTML += `
-                <div class="flex justify-between items-center border-b pb-2">
+                <div class="flex justify-between items-center border-b pb-2 text-black">
                     <div class="text-[11px]">
                         <p class="font-bold uppercase">${item.nome}</p>
                         <p class="text-red-600 font-bold">TAM: ${item.tamanho} | R$ ${precoU.toFixed(2)}</p>
@@ -267,10 +262,30 @@
     function moveSlide(n) { const s = document.querySelectorAll(".carousel-item"); let a = 0; s.forEach((img, i) => { if(img.classList.contains('active')){ a = i; img.classList.remove('active'); }}); let next = (a + n + s.length) % s.length; s[next].classList.add('active'); }
     setInterval(() => moveSlide(1), 5000);
 
-    function enviarWhatsApp() {
+    async function enviarWhatsApp() {
         if (!carrinho.length) return;
         const cep = document.getElementById('cep-destino').value;
         if (!cep) { alert("Informe o CEP!"); return; }
+
+        const btn = document.getElementById('btn-finalizar');
+        const originalText = btn.innerText;
+        btn.innerText = "PROCESSANDO...";
+        btn.disabled = true;
+
+        // 1. Enviar baixa de estoque para a planilha
+        try {
+            const dadosVenda = { itens: carrinho.map(i => ({ id: i.id, tamanho: i.tamanho, qtd: i.qtd })) };
+            await fetch(URL_SCRIPT_ESTOQUE, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dadosVenda)
+            });
+        } catch (e) {
+            console.error("Erro ao atualizar estoque:", e);
+        }
+
+        // 2. Montar mensagem do WhatsApp
         let qtdT = carrinho.reduce((s, i) => s + i.qtd, 0);
         let eAtacado = qtdT >= 4, totalF = 0, totalV = 0;
         let msg = `🚀 *PEDIDO BRAZUKA 1.1*\n\n`;
@@ -280,7 +295,14 @@
             msg += `✅ ${i.qtd}x ${i.nome} (${i.tamanho}) - R$ ${p.toFixed(2)}\n`;
         });
         msg += `\n💰 *Total: R$ ${totalF.toFixed(2)}*\n🎁 Economia: R$ ${(totalV-totalF).toFixed(2)}\n📍 CEP: ${cep}`;
+        
+        // 3. Abrir WhatsApp e dar Refresh
         window.open(`https://wa.me/5521986285970?text=${encodeURIComponent(msg)}`);
+        
+        alert("Pedido enviado! Atualizando estoque...");
+        setTimeout(() => {
+            location.reload();
+        }, 1500);
     }
 
     carregarProdutos();
