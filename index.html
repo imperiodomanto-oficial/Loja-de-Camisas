@@ -323,8 +323,7 @@
             totalF += p * i.qtd; totalV += i.precoVarejo * i.qtd;
             msg += `✅ ${i.qtd}x ${i.nome} (${i.tamanho}) - R$ ${p.toFixed(2)}\n`;
         });
-        msg += `\n💰 *Total: R$ ${totalF.toFixed(2)}*\n🎁 Economia: R$ ${(totalV-totalF).toFixed(2)}\n📍 CEP: ${cep}`;
-        msg += `\n\n⚠️ _Por favor, me informe o frete para finalizar!_`;
+        msg += `\n💰 *Total: R$ ${totalF.toFixed(2)}*\n🎁 Economia: R$ ${(totalV-totalF).toFixed(2)}\n📍 CEP: ${cep}`; msg += `\n\n⚠️ _Aguarde que informaremos o valor do frete!_`;
         window.open(`https://wa.me/5521986285970?text=${encodeURIComponent(msg)}`);
         
         alert("Pedido enviado! O estoque será atualizado.");
