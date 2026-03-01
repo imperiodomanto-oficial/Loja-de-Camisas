@@ -168,60 +168,77 @@
     }
 
     async function calcularFreteWorker() {
-        const cepDestino = document.getElementById('cep-destino').value.replace(/\D/g, '');
-        const btn = document.getElementById('btn-calc-frete');
-        const infoFrete = document.getElementById('info-frete');
-        const resultadoDiv = document.getElementById('resultado-frete');
+    const cepDestino = document.getElementById('cep-destino').value.replace(/\D/g, '');
+    const btn = document.getElementById('btn-calc-frete');
+    const infoFrete = document.getElementById('info-frete');
+    const resultadoDiv = document.getElementById('resultado-frete');
 
-        if (cepDestino.length !== 8) { alert("Digite um CEP válido."); return; }
-        if (carrinho.length === 0) { alert("Adicione itens ao carrinho primeiro."); return; }
-        
-        btn.innerText = "Calculando...";
-        btn.disabled = true;
-
-        const totalItens = carrinho.reduce((sum, item) => sum + item.qtd, 0);
-        const pesoTotal = totalItens * 0.3;
-
-        try {
-            const response = await fetch(URL_WORKER_FRETE, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'text/plain' 
-                },
-                body: JSON.stringify({
-                    "from": "25946568",
-                    "to": cepDestino,
-                    "services": "1,2,3,4,5,6,7,17",
-                    "options": { "width": 20, "height": 10, "length": 25, "weight": pesoTotal }
-                })
-            });
-
-            if (!response.ok) throw new Error("Erro ao conectar com servidor de frete");
-
-            const data = await response.json();
-            if (data.error) throw new Error(data.error);
-
-            // Filtra o primeiro serviço válido que não tenha erro e tenha preço
-            const opcao = Array.isArray(data) ? data.find(s => !s.error && s.price) : null;
-
-            if (opcao) {
-                valorFreteGlobal = parseFloat(opcao.price);
-                resultadoDiv.classList.remove('hidden');
-                // Ajustado para pegar o tempo de entrega correto da API
-                const prazo = opcao.delivery_range ? opcao.delivery_range.max : opcao.delivery;
-                infoFrete.innerText = `🚚 ${opcao.name}: R$ ${valorFreteGlobal.toFixed(2)} (${prazo} dias)`;
-                renderizarCarrinho();
-            } else { 
-                alert("CEP não atendido. Tente outro."); 
-            }
-        } catch (e) { 
-            console.error("Erro detalhado:", e);
-            alert("O servidor de frete recusou a conexão ou o CEP é inválido."); 
-        } finally { 
-            btn.innerText = "Calcular"; 
-            btn.disabled = false; 
-        }
+    if (cepDestino.length !== 8) { 
+        alert("Digite um CEP válido."); 
+        return; 
     }
+
+    if (carrinho.length === 0) { 
+        alert("Adicione itens ao carrinho primeiro."); 
+        return; 
+    }
+    
+    btn.innerText = "Calculando...";
+    btn.disabled = true;
+
+    const totalItens = carrinho.reduce((sum, item) => sum + item.qtd, 0);
+    const pesoTotal = totalItens * 0.3;
+
+    try {
+        const response = await fetch(URL_WORKER_FRETE, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                from: { postal_code: "25946568" },
+                to: { postal_code: cepDestino },
+                package: {
+                    width: 20,
+                    height: 10,
+                    length: 25,
+                    weight: pesoTotal
+                }
+            })
+        });
+
+        if (!response.ok) {
+            const erroTexto = await response.text();
+            throw new Error(erroTexto);
+        }
+
+        const data = await response.json();
+
+        // Se o Super Frete retornar múltiplas opções
+        const opcao = Array.isArray(data)
+            ? data.find(s => !s.error && s.price)
+            : data;
+
+        if (!opcao || !opcao.price) {
+            alert("CEP não atendido.");
+            return;
+        }
+
+        valorFreteGlobal = parseFloat(opcao.price);
+
+        resultadoDiv.classList.remove('hidden');
+        infoFrete.innerText = `🚚 Frete: R$ ${valorFreteGlobal.toFixed(2)}`;
+
+        renderizarCarrinho();
+
+    } catch (e) {
+        console.error("Erro detalhado:", e);
+        alert("Erro ao calcular frete. Verifique o Worker.");
+    } finally {
+        btn.innerText = "Calcular";
+        btn.disabled = false;
+    }
+
 
     function renderizarCarrinho() {
         const lista = document.getElementById('cart-items-list');
