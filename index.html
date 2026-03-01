@@ -7,10 +7,22 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #000; font-family: sans-serif; margin: 0; padding: 0; }
+        body { background-color: #000; font-family: sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         .site-container { background-color: #f3f3f3; max-width: 500px; margin: 0 auto; min-height: 100vh; position: relative; padding-bottom: 20px; }
-        .banner-header { width: 100%; height: 130px; overflow: hidden; position: relative; background-color: #000; }
+        
+        /* BANNER & HEADER */
+        .banner-header { width: 100%; height: 130px; overflow: hidden; position: relative; background-color: #000; display: flex; align-items: center; justify-content: center; }
         .banner-img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.2); object-position: center; }
+        
+        /* MENU LATERAL */
+        .side-menu { position: fixed; top: 0; left: -100%; width: 80%; max-width: 300px; height: 100%; background-color: #111; z-index: 200; transition: 0.4s; padding-top: 20px; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
+        .side-menu.active { left: 0; }
+        .side-menu a { display: block; padding: 15px 25px; color: #fff; text-transform: uppercase; font-size: 13px; font-weight: bold; border-bottom: 1px solid #222; text-decoration: none; }
+        .side-menu a:active { background-color: #bf953f; color: #000; }
+        .overlay-menu { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 150; }
+        .btn-menu-trigger { position: absolute; left: 15px; top: 15px; color: #fff; font-size: 22px; cursor: pointer; z-index: 60; background: rgba(0,0,0,0.4); padding: 5px 10px; rounded: 5px; }
+
+        /* CARROSSEL & CARDS */
         .carousel { position: relative; width: 100%; height: 350px; overflow: hidden; background-color: #000; }
         .carousel-item { display: none; width: 100%; height: 100%; object-fit: cover; }
         .carousel-item.active { display: block; }
@@ -18,50 +30,46 @@
         .price-main { color: #333; font-size: 1.2rem; font-weight: 800; }
         .atacado-box { border-top: 1px solid #d4af37; border-bottom: 1px solid #d4af37; width: 90%; margin: 5px 0; text-align: center; padding: 2px 0; }
         .btn-dourado { background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c); color: #000; border: none; font-weight: 900; transition: 0.3s; }
-        .btn-dourado:active { transform: scale(0.95); filter: brightness(1.2); }
+        
+        /* TAMANHOS */
         .size-box { border: 1px solid #333; width: 28px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; cursor: pointer; background: white; color: black; }
         .size-selected { background-color: #000 !important; color: #fff !important; }
         .size-off { border: 1px solid #ddd !important; color: #ccc !important; position: relative; cursor: not-allowed !important; pointer-events: none; }
         .size-off::after { content: ""; position: absolute; width: 100%; height: 1px; background: #ccc; transform: rotate(-45deg); }
-        .cep-input, .search-input { border: 1px solid #ccc; padding: 8px; border-radius: 4px; width: 100%; font-size: 14px; outline: none; }
-        .cep-input:focus, .search-input:focus { border-color: #bf953f; }
         
-        /* BOTÃO FLUTUANTE WHATSAPP */
-        .btn-whatsapp-fixo {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #25d366;
-            color: #fff;
-            width: 60px;
-            height: 60px;
-            border-radius: 50px;
-            text-align: center;
-            font-size: 30px;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
-            z-index: 90;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: pulse-green 2s infinite;
-            text-decoration: none;
-        }
-
-        @keyframes pulse-green {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
-        }
+        /* INPUTS */
+        .cep-input, .search-input { border: 1px solid #ccc; padding: 8px; border-radius: 4px; width: 100%; font-size: 14px; outline: none; }
+        
+        /* WHATSAPP FLUTUANTE */
+        .btn-whatsapp-fixo { position: fixed; bottom: 20px; right: 20px; background-color: #25d366; color: #fff; width: 60px; height: 60px; border-radius: 50px; text-align: center; font-size: 30px; box-shadow: 2px 2px 10px rgba(0,0,0,0.3); z-index: 90; display: flex; align-items: center; justify-content: center; animation: pulse-green 2s infinite; }
+        @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
     </style>
 </head>
 <body>
 
 <div class="site-container">
-    <a href="https://wa.me/5521986285970?text=Olá! Gostaria de tirar uma dúvida sobre as camisas." target="_blank" class="btn-whatsapp-fixo">
+    <div id="overlay" class="overlay-menu" onclick="toggleMenu()"></div>
+    <div id="sideMenu" class="side-menu">
+        <div class="px-6 py-4 border-b border-yellow-600 mb-2">
+            <h3 class="text-white font-black uppercase text-lg italic">Brazuka 1.1</h3>
+        </div>
+        <a href="#" onclick="toggleMenu()">Início</a>
+        <a href="#" onclick="filtrarProdutos('torcedor')">Versão Torcedor</a>
+        <a href="#" onclick="filtrarProdutos('jogador')">Versão Jogador</a>
+        <a href="#" onclick="filtrarProdutos('feminina')">Camisas Femininas</a>
+        <a href="#" onclick="filtrarProdutos('selecoes')">Seleções</a>
+        <a href="#" onclick="filtrarProdutos('retro')">Camisas Retrô</a>
+        <a href="https://wa.me/5521986285970" target="_blank">Contato / Suporte</a>
+    </div>
+
+    <a href="https://wa.me/5521986285970?text=Olá! Gostaria de tirar uma dúvida." target="_blank" class="btn-whatsapp-fixo">
         <i class="fab fa-whatsapp"></i>
     </a>
 
     <header class="banner-header sticky top-0 z-50 border-b border-yellow-600 shadow-xl">
+        <div class="btn-menu-trigger" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </div>
         <img src="banner-topo.png" alt="Brazuka 1.1" class="banner-img">
         <button onclick="toggleCart()" class="absolute right-3 top-3 bg-black/60 p-2 rounded-full border border-white/20">
             <i class="fas fa-shopping-cart text-xl text-white"></i>
@@ -79,7 +87,7 @@
 
     <div class="p-3 bg-white border-b">
         <div class="relative">
-            <input type="text" id="input-busca" onkeyup="filtrarProdutos()" placeholder="Buscar camisa..." class="search-input pl-10">
+            <input type="text" id="input-busca" onkeyup="buscarNoGrid()" placeholder="Buscar camisa..." class="search-input pl-10">
             <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
         </div>
     </div>
@@ -90,43 +98,32 @@
         <p class="text-center col-span-2 py-10">Carregando estoque...</p>
     </div>
 
-    <footer class="bg-white border-t mt-6 p-6 text-black text-center">
-        <h4 class="font-black uppercase text-sm mb-2">Brazuka 1.1</h4>
-        <p class="text-xs text-gray-600 mb-4"><i class="fab fa-whatsapp"></i> 5521986285970</p>
-        <p class="text-[10px] text-gray-400">© 2026 Todos os direitos reservados.</p>
-    </footer>
-
     <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-60 z-[100] hidden">
         <div class="absolute right-0 top-0 h-full w-[90%] bg-white shadow-xl flex flex-col text-black">
             <div class="p-4 bg-[#333] text-white flex justify-between items-center">
-                <h2 class="font-bold uppercase tracking-tighter">🛒 Meu Carrinho</h2>
+                <h2 class="font-bold uppercase tracking-tighter italic">🛒 Meu Carrinho</h2>
                 <button onclick="toggleCart()" class="text-3xl">&times;</button>
             </div>
-            
             <div id="cart-items-list" class="flex-1 overflow-y-auto p-4 space-y-6"></div>
-
             <div class="p-4 bg-gray-100 border-t border-b">
-                <label class="text-[10px] font-bold uppercase text-gray-500 mb-1 block">Informe seu CEP para o frete:</label>
-                <div class="flex gap-2">
-                    <input type="text" id="cep-destino" placeholder="00000-000" class="cep-input" maxlength="9">
-                </div>
+                <label class="text-[10px] font-bold uppercase text-gray-500 mb-1 block">Seu CEP para frete:</label>
+                <input type="text" id="cep-destino" placeholder="00000-000" class="cep-input" maxlength="9">
             </div>
-
             <div class="p-4 bg-gray-50">
                 <div id="aviso-atacado" class="text-[10px] text-center font-bold text-green-700 mb-2 hidden">🔥 MODO ATACADO ATIVADO!</div>
                 <div class="flex justify-between text-xs text-gray-500 mb-1">
-                    <span>Subtotal Camisas:</span>
+                    <span>Subtotal:</span>
                     <span id="subtotal-value">R$ 0,00</span>
                 </div>
                 <div id="economia-row" class="flex justify-between text-xs text-green-600 font-bold mb-1 hidden">
-                    <span>Economia Atacado:</span>
+                    <span>Você economizou:</span>
                     <span id="economia-value">R$ 0,00</span>
                 </div>
                 <div class="flex justify-between font-black text-lg mb-4 border-t pt-2">
                     <span>TOTAL:</span>
                     <span id="cart-total-value">R$ 0,00</span>
                 </div>
-                <button id="btn-finalizar" onclick="enviarWhatsApp()" class="w-full bg-[#28a745] text-white py-4 rounded font-black uppercase text-sm shadow-lg">Enviar Pedido para Orçamento</button>
+                <button onclick="enviarWhatsApp()" class="w-full bg-[#28a745] text-white py-4 rounded font-black uppercase text-sm shadow-lg">Finalizar Pedido</button>
             </div>
         </div>
     </div>
@@ -134,140 +131,136 @@
 
 <script>
     const linkPlanilha = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR0m7HN1ePfdwVgr0aaFfYjjFv6r1zag8fZ4x5Ih8XKPLjEIe97nRHqU-hWKWfBEksbOH5Mw8u2Y6VZ/pub?output=csv";
+    let produtosData = [], carrinho = [], selecoesTemporarias = {};
 
-    let produtosData = [];
-    let carrinho = [];
-    let selecoesTemporarias = {};
+    function toggleMenu() {
+        const m = document.getElementById('sideMenu');
+        const o = document.getElementById('overlay');
+        m.classList.toggle('active');
+        o.style.display = m.classList.contains('active') ? 'block' : 'none';
+    }
 
     async function carregarProdutos() {
         try {
-            const resposta = await fetch(linkPlanilha);
-            const dadosText = await resposta.text();
-            const linhas = dadosText.split('\n').slice(1);
+            const r = await fetch(linkPlanilha);
+            const t = await r.text();
+            const linhas = t.split('\n').slice(1);
             const grid = document.getElementById('grid-produtos');
             grid.innerHTML = "";
             produtosData = []; 
 
-            linhas.forEach(linha => {
-                const col = linha.split(',');
-                if(col.length < 5) return;
-                const prod = {
-                    id: col[0].trim(), nome: col[1].trim(), preco: parseFloat(col[2]), atacado: parseFloat(col[3]), imagem: col[4].trim(),
-                    estoque: { P: parseInt(col[5])||0, M: parseInt(col[6])||0, G: parseInt(col[7])||0, GG: parseInt(col[8])||0 }
+            linhas.forEach(l => {
+                const c = l.split(',');
+                if(c.length < 5) return;
+                const p = {
+                    id: c[0].trim(), nome: c[1].trim(), preco: parseFloat(c[2]), atacado: parseFloat(c[3]), imagem: c[4].trim(),
+                    estoque: { P: parseInt(c[5])||0, M: parseInt(c[6])||0, G: parseInt(c[7])||0, GG: parseInt(c[8])||0 }
                 };
-                produtosData.push(prod);
-                let tamHTML = "";
-                for (let t in prod.estoque) {
-                    if (prod.estoque[t] > 0) tamHTML += `<button onclick="selecionarTamanho(this, '${prod.id}')" class="size-box">${t}</button>`;
-                    else tamHTML += `<button class="size-box size-off">${t}</button>`;
+                produtosData.push(p);
+                let tams = "";
+                for (let tam in p.estoque) {
+                    if (p.estoque[tam] > 0) tams += `<button onclick="selecionarTamanho(this, '${p.id}')" class="size-box">${tam}</button>`;
+                    else tams += `<button class="size-box size-off">${tam}</button>`;
                 }
                 grid.innerHTML += `
-                    <div class="card-artilheiro item-produto" data-nome="${prod.nome.toLowerCase()}" id="${prod.id}">
-                        <img src="${prod.imagem}" class="w-full h-44 object-cover">
-                        <h3 class="text-[10px] px-2 h-8 text-center leading-tight font-bold mt-1 uppercase">${prod.nome}</h3>
-                        <span class="price-main">R$ ${prod.preco.toFixed(2)}</span>
+                    <div class="card-artilheiro item-produto" data-nome="${p.nome.toLowerCase()}" id="${p.id}">
+                        <img src="${p.imagem}" class="w-full h-44 object-cover">
+                        <h3 class="text-[10px] px-2 h-8 text-center font-bold mt-1 uppercase">${p.nome}</h3>
+                        <span class="price-main">R$ ${p.preco.toFixed(2)}</span>
                         <div class="atacado-box">
-                            <span class="text-[9px] text-yellow-700 font-bold uppercase">— Atacado —</span>
-                            <p class="text-[8px]">Mín. 4 un. por <b>R$ ${prod.atacado.toFixed(2)}</b></p>
+                            <span class="text-[8px] text-yellow-700 font-bold uppercase">Atacado (4+ un): R$ ${p.atacado.toFixed(2)}</span>
                         </div>
-                        <div class="flex gap-1 my-2">${tamHTML}</div>
-                        <button onclick="adicionarAoCarrinho('${prod.id}')" class="w-[90%] btn-dourado py-2 rounded text-[11px] uppercase shadow-md">Comprar</button>
+                        <div class="flex gap-1 my-2">${tams}</div>
+                        <button onclick="adicionarAoCarrinho('${p.id}')" class="w-[90%] btn-dourado py-2 rounded text-[11px] uppercase">Comprar</button>
                     </div>`;
             });
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("Erro ao carregar planilha", e); }
     }
 
-    function filtrarProdutos() {
-        const t = document.getElementById('input-busca').value.toLowerCase();
-        document.querySelectorAll('.item-produto').forEach(p => p.style.display = p.getAttribute('data-nome').includes(t) ? "flex" : "none");
+    function buscarNoGrid() {
+        const termo = document.getElementById('input-busca').value.toLowerCase();
+        document.querySelectorAll('.item-produto').forEach(p => {
+            p.style.display = p.getAttribute('data-nome').includes(termo) ? "flex" : "none";
+        });
+    }
+
+    function filtrarProdutos(cat) {
+        toggleMenu();
+        const busca = document.getElementById('input-busca');
+        busca.value = cat === 'todos' ? "" : cat;
+        buscarNoGrid();
+    }
+
+    function selecionarTamanho(btn, id) {
+        document.getElementById(id).querySelectorAll('.size-box').forEach(b => b.classList.remove('size-selected'));
+        btn.classList.add('size-selected');
+        selecoesTemporarias[id] = btn.innerText;
+    }
+
+    function adicionarAoCarrinho(id) {
+        const p = produtosData.find(x => x.id === id);
+        const t = selecoesTemporarias[id];
+        if (!t) { alert("Escolha o tamanho!"); return; }
+        const jaTem = carrinho.findIndex(i => i.id === id && i.tamanho === t);
+        if (jaTem !== -1) carrinho[jaTem].qtd++;
+        else carrinho.push({ id, nome: p.nome, tamanho: t, precoVarejo: p.preco, precoAtacado: p.atacado, qtd: 1 });
+        document.getElementById('cart-count').innerText = carrinho.reduce((s, i) => s + i.qtd, 0);
+        alert("Adicionado!");
     }
 
     function renderizarCarrinho() {
         const lista = document.getElementById('cart-items-list');
-        const avisoAtacado = document.getElementById('aviso-atacado');
-        const economiaRow = document.getElementById('economia-row');
-        let totalFinal = 0, totalVarejoSim = 0;
-        let qtdTotal = carrinho.reduce((s, i) => s + i.qtd, 0);
-        let eAtacado = qtdTotal >= 4;
+        const aviso = document.getElementById('aviso-atacado');
+        const ecoRow = document.getElementById('economia-row');
+        let totalF = 0, totalV = 0;
+        let qtdT = carrinho.reduce((s, i) => s + i.qtd, 0);
+        let eAtacado = qtdT >= 4;
 
-        lista.innerHTML = carrinho.length === 0 ? '<p class="text-center text-gray-400 mt-10">Carrinho vazio</p>' : '';
-        
-        carrinho.forEach((item, index) => {
-            let precoUnit = eAtacado ? item.precoAtacado : item.precoVarejo;
-            totalFinal += precoUnit * item.qtd;
-            totalVarejoSim += item.precoVarejo * item.qtd;
-
+        lista.innerHTML = carrinho.length === 0 ? '<p class="text-center text-gray-400 mt-10">Vazio</p>' : '';
+        carrinho.forEach((item, idx) => {
+            let precoU = eAtacado ? item.precoAtacado : item.precoVarejo;
+            totalF += precoU * item.qtd;
+            totalV += item.precoVarejo * item.qtd;
             lista.innerHTML += `
-                <div class="flex justify-between items-center border-b pb-4">
-                    <div class="flex-1">
-                        <p class="font-black text-[11px] uppercase">${item.nome}</p>
-                        <p class="text-red-600 text-[10px] font-bold">TAM: ${item.tamanho}</p>
-                        <p class="text-gray-500 text-[11px]">R$ ${precoUnit.toFixed(2)} un. ${eAtacado ? '<span class="text-green-600 font-bold">(Atacado)</span>' : ''}</p>
+                <div class="flex justify-between items-center border-b pb-2">
+                    <div class="text-[11px]">
+                        <p class="font-bold uppercase">${item.nome}</p>
+                        <p class="text-red-600 font-bold">TAM: ${item.tamanho} | R$ ${precoU.toFixed(2)}</p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <button onclick="alterarQtd(${index}, -1)" class="px-2 bg-gray-200">-</button>
-                        <span class="font-bold">${item.qtd}</span>
-                        <button onclick="alterarQtd(${index}, 1)" class="px-2 bg-gray-200">+</button>
+                    <div class="flex items-center gap-2">
+                        <button onclick="alterarQtd(${idx},-1)" class="bg-gray-200 px-2">-</button>
+                        <span>${item.qtd}</span>
+                        <button onclick="alterarQtd(${idx},1)" class="bg-gray-200 px-2">+</button>
                     </div>
                 </div>`;
         });
 
-        const eco = totalVarejoSim - totalFinal;
-        if (eAtacado && eco > 0) { avisoAtacado.classList.remove('hidden'); economiaRow.classList.remove('hidden'); document.getElementById('economia-value').innerText = `R$ ${eco.toFixed(2)}`; }
-        else { avisoAtacado.classList.add('hidden'); economiaRow.classList.add('hidden'); }
-
-        document.getElementById('subtotal-value').innerText = `R$ ${totalFinal.toFixed(2)}`;
-        document.getElementById('cart-total-value').innerText = `R$ ${totalFinal.toFixed(2)}`;
+        let eco = totalV - totalF;
+        if (eAtacado && eco > 0) { aviso.classList.remove('hidden'); ecoRow.classList.remove('hidden'); document.getElementById('economia-value').innerText = `R$ ${eco.toFixed(2)}`; }
+        else { aviso.classList.add('hidden'); ecoRow.classList.add('hidden'); }
+        document.getElementById('subtotal-value').innerText = `R$ ${totalF.toFixed(2)}`;
+        document.getElementById('cart-total-value').innerText = `R$ ${totalF.toFixed(2)}`;
     }
 
-    function selecionarTamanho(b, id) {
-        document.getElementById(id).querySelectorAll('.size-box').forEach(x => x.classList.remove('size-selected'));
-        b.classList.add('size-selected');
-        selecoesTemporarias[id] = b.innerText;
-    }
-
-    function adicionarAoCarrinho(id) {
-        const prod = produtosData.find(p => p.id === id);
-        const tam = selecoesTemporarias[id];
-        if (!tam) { alert("Selecione o tamanho!"); return; }
-        const idx = carrinho.findIndex(i => i.id === id && i.tamanho === tam);
-        if (idx !== -1) carrinho[idx].qtd++;
-        else carrinho.push({ id, nome: prod.nome, tamanho: tam, precoVarejo: prod.preco, precoAtacado: prod.atacado, qtd: 1 });
-        atualizarContador();
-        alert("Adicionado!");
-    }
-
-    function atualizarContador() { document.getElementById('cart-count').innerText = carrinho.reduce((s, i) => s + i.qtd, 0); }
-    function alterarQtd(idx, d) { carrinho[idx].qtd += d; if (carrinho[idx].qtd <= 0) carrinho.splice(idx, 1); atualizarContador(); renderizarCarrinho(); }
+    function alterarQtd(i, d) { carrinho[i].qtd += d; if(carrinho[i].qtd <= 0) carrinho.splice(i,1); renderizarCarrinho(); document.getElementById('cart-count').innerText = carrinho.reduce((s, i) => s + i.qtd, 0); }
     function toggleCart() { document.getElementById('cart-modal').classList.toggle('hidden'); renderizarCarrinho(); }
-    function moveSlide(n) { const s = document.querySelectorAll(".carousel-item"); let active = 0; s.forEach((img, i) => { if(img.classList.contains('active')){ active = i; img.classList.remove('active'); }}); let next = (active + n + s.length) % s.length; s[next].classList.add('active'); }
+    function moveSlide(n) { const s = document.querySelectorAll(".carousel-item"); let a = 0; s.forEach((img, i) => { if(img.classList.contains('active')){ a = i; img.classList.remove('active'); }}); let next = (a + n + s.length) % s.length; s[next].classList.add('active'); }
     setInterval(() => moveSlide(1), 5000);
 
-    async function enviarWhatsApp() {
-        if (carrinho.length === 0) { alert("Adicione itens!"); return; }
+    function enviarWhatsApp() {
+        if (!carrinho.length) return;
         const cep = document.getElementById('cep-destino').value;
-        if (!cep) { alert("Informe seu CEP!"); return; }
-
-        let qtdTotal = carrinho.reduce((s, i) => s + i.qtd, 0);
-        let eAtacado = qtdTotal >= 4, totalF = 0, totalV = 0;
-        
-        let msg = "🚀 *NOVO PEDIDO - BRAZUKA 1.1*\n\n";
-        msg += eAtacado ? "🔥 *MODO ATACADO ATIVADO* 🔥\n\n" : "🛒 *MODO VAREJO*\n\n";
-        
-        carrinho.forEach((item) => {
-            let p = eAtacado ? item.precoAtacado : item.precoVarejo;
-            totalF += p * item.qtd;
-            totalV += item.precoVarejo * item.qtd;
-            msg += `✅ ${item.qtd}x ${item.nome} (TAM: ${item.tamanho}) - R$ ${p.toFixed(2)} un.\n`;
+        if (!cep) { alert("Informe o CEP!"); return; }
+        let qtdT = carrinho.reduce((s, i) => s + i.qtd, 0);
+        let eAtacado = qtdT >= 4, totalF = 0, totalV = 0;
+        let msg = `🚀 *PEDIDO BRAZUKA 1.1*\n\n`;
+        carrinho.forEach(i => {
+            let p = eAtacado ? i.precoAtacado : i.precoVarejo;
+            totalF += p * i.qtd; totalV += i.precoVarejo * i.qtd;
+            msg += `✅ ${i.qtd}x ${i.nome} (${i.tamanho}) - R$ ${p.toFixed(2)}\n`;
         });
-        
-        let eco = totalV - totalF;
-        msg += `\n💰 *VALOR TOTAL: R$ ${totalF.toFixed(2)}*`;
-        if(eAtacado && eco > 0) msg += `\n🎁 Economia: R$ ${eco.toFixed(2)}`;
-        msg += `\n📍 *CEP:* ${cep}`;
-        msg += `\n\n⚠️ _Por favor, me informe o frete para finalizar!_`;
-        
-        window.open(`https://wa.me/5521986285970?text=${encodeURIComponent(msg)}`, '_blank');
+        msg += `\n💰 *Total: R$ ${totalF.toFixed(2)}*\n🎁 Economia: R$ ${(totalV-totalF).toFixed(2)}\n📍 CEP: ${cep}`;
+        window.open(`https://wa.me/5521986285970?text=${encodeURIComponent(msg)}`);
     }
 
     carregarProdutos();
