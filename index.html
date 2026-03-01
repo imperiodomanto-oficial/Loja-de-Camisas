@@ -186,43 +186,42 @@
         btn.disabled = true;
 
         const totalItens = carrinho.reduce((sum, item) => sum + item.qtd, 0);
-        const pesoTotal = totalItens * 0.3;
+        const pesoTotal = totalItens > 0 ? totalItens * 0.3 : 0.3;
 
         try {
             const response = await fetch(URL_WORKER_FRETE, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    to: { postal_code: cepDestino },
-                    package: {
-                        width: 20,
-                        height: 10,
-                        length: 25,
-                        weight: pesoTotal
-                    }
-                })
+                body: JSON.stringify({ to: cepDestino, weight: pesoTotal })
             });
 
-            const data = await response.json();
-            console.log("Resposta Worker:", data);
+            const text = await response.text();
+            let data;
+            
+            try {
+                data = JSON.parse(text);
+            } catch(e) {
+                console.error("Resposta não-JSON:", text);
+                alert("O servidor de frete enviou uma resposta inválida. Verifique o Worker.");
+                return;
+            }
 
-            // Ajuste para lidar com diferentes formatos de retorno da API
             const servicos = Array.isArray(data) ? data : (data.services || []);
             const opcao = servicos.find(s => s.price && !s.error);
 
             if (opcao) {
                 valorFreteGlobal = parseFloat(opcao.price);
                 resultadoDiv.classList.remove('hidden');
-                const prazo = opcao.delivery_time || opcao.delivery_days || "7-10";
+                const prazo = opcao.delivery_time || "7-10";
                 infoFrete.innerText = `🚚 ${opcao.name}: R$ ${valorFreteGlobal.toFixed(2)} (${prazo} dias)`;
                 renderizarCarrinho();
             } else {
-                alert(data.error || data.message || "CEP não atendido ou erro nas dimensões.");
+                alert("Não foi possível calcular o frete para este CEP.");
             }
 
         } catch (e) {
-            console.error("Erro detalhado:", e);
-            alert("Erro ao calcular frete. Verifique se o Worker está online.");
+            console.error("Erro Fetch:", e);
+            alert("Erro na conexão com o sistema de frete.");
         } finally {
             btn.innerText = "Calcular";
             btn.disabled = false;
