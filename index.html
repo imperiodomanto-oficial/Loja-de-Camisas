@@ -41,6 +41,14 @@
         .cep-input, .search-input, .select-input { border: 1px solid #ccc; padding: 8px; border-radius: 4px; width: 100%; font-size: 14px; outline: none; background: white; }
         .cep-input:disabled { background-color: #eee; cursor: not-allowed; }
         
+        /* GALERIA AMPLIADA */
+        .modal-galeria { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 300; display: none; align-items: center; justify-content: center; }
+        .modal-galeria.active { display: flex; }
+        .galeria-content { width: 90%; max-width: 450px; position: relative; }
+        .galeria-img { width: 100%; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); max-height: 80vh; object-fit: contain; }
+        .galeria-nav { position: absolute; top: 50%; width: 100%; display: flex; justify-content: space-between; transform: translateY(-50%); pointer-events: none; }
+        .btn-nav-galeria { background: rgba(0,0,0,0.5); color: white; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; pointer-events: auto; }
+
         /* WHATSAPP FLUTUANTE */
         .btn-whatsapp-fixo { position: fixed; bottom: 20px; right: 20px; background-color: #25d366; color: #fff; width: 60px; height: 60px; border-radius: 50px; text-align: center; font-size: 30px; box-shadow: 2px 2px 10px rgba(0,0,0,0.3); z-index: 90; display: flex; align-items: center; justify-content: center; animation: pulse-green 2s infinite; text-decoration: none; }
         @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
@@ -113,7 +121,7 @@
                     <label class="text-[10px] font-bold uppercase text-gray-500 mb-1 block">Como deseja receber?</label>
                     <select id="forma-entrega" class="select-input" onchange="toggleCepInput()">
                         <option value="frete">Enviar para meu endereço</option>
-                        <option value="retirar">Retirar no local </option>
+                        <option value="retirar">Retirar no local</option>
                     </select>
                 </div>
                 <div id="campo-cep">
@@ -140,6 +148,17 @@
             </div>
         </div>
     </div>
+
+    <div id="modal-galeria" class="modal-galeria" onclick="fecharGaleria(event)">
+        <div class="galeria-content">
+            <img id="img-ampliada" src="" class="galeria-img">
+            <div id="nav-galeria" class="galeria-nav">
+                <button onclick="mudarFotoGaleria(-1)" class="btn-nav-galeria">❮</button>
+                <button onclick="mudarFotoGaleria(1)" class="btn-nav-galeria">❯</button>
+            </div>
+            <button onclick="toggleGaleria()" class="absolute -top-12 right-0 text-white text-4xl">&times;</button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -147,6 +166,7 @@
     const linkPlanilha = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR0m7HN1ePfdwVgr0aaFfYjjFv6r1zag8fZ4x5Ih8XKPLjEIe97nRHqU-hWKWfBEksbOH5Mw8u2Y6VZ/pub?output=csv";
     
     let produtosData = [], carrinho = [], selecoesTemporarias = {};
+    let fotosAtuais = [], fotoIndice = 0;
 
     function toggleMenu() {
         const m = document.getElementById('sideMenu');
@@ -185,11 +205,13 @@
                     nome: c[1].trim(), 
                     preco: parseFloat(c[2]), 
                     atacado: parseFloat(c[3]), 
-                    imagem: c[4].trim(),
+                    imagem: c[4].trim(), // Aqui pode vir "link1,link2"
                     estoque: { P: parseInt(c[5])||0, M: parseInt(c[6])||0, G: parseInt(c[7])||0, GG: parseInt(c[8])||0 },
                     categoria: c[9] ? c[9].trim().toLowerCase() : "todos"
                 };
                 produtosData.push(p);
+                
+                const primeiraFoto = p.imagem.split(',')[0];
                 
                 let tams = "";
                 for (let tam in p.estoque) {
@@ -198,7 +220,7 @@
                 }
                 grid.innerHTML += `
                     <div class="card-artilheiro item-produto" data-nome="${p.nome.toLowerCase()}" data-cat="${p.categoria}" id="${p.id}">
-                        <img src="${p.imagem}" class="w-full h-44 object-cover">
+                        <img src="${primeiraFoto}" onclick="abrirGaleria('${p.imagem}')" class="w-full h-44 object-cover cursor-zoom-in" title="Clique para ver mais fotos">
                         <h3 class="text-[10px] px-2 h-8 text-center font-bold mt-1 uppercase">${p.nome}</h3>
                         <span class="price-main">R$ ${p.preco.toFixed(2)}</span>
                         <div class="atacado-box">
@@ -209,6 +231,30 @@
                     </div>`;
             });
         } catch (e) { console.error("Erro ao carregar planilha", e); }
+    }
+
+    // FUNÇÕES DA GALERIA
+    function abrirGaleria(stringFotos) {
+        fotosAtuais = stringFotos.split(',').map(f => f.trim());
+        fotoIndice = 0;
+        document.getElementById('img-ampliada').src = fotosAtuais[0];
+        document.getElementById('modal-galeria').classList.add('active');
+        
+        // Esconde as setas se tiver só uma foto
+        document.getElementById('nav-galeria').style.display = fotosAtuais.length > 1 ? 'flex' : 'none';
+    }
+
+    function mudarFotoGaleria(direcao) {
+        fotoIndice = (fotoIndice + direcao + fotosAtuais.length) % fotosAtuais.length;
+        document.getElementById('img-ampliada').src = fotosAtuais[fotoIndice];
+    }
+
+    function fecharGaleria(e) {
+        if(e.target.id === 'modal-galeria') toggleGaleria();
+    }
+
+    function toggleGaleria() {
+        document.getElementById('modal-galeria').classList.toggle('active');
     }
 
     function buscarNoGrid() {
@@ -311,42 +357,33 @@
     }
 
     function toggleCart() { document.getElementById('cart-modal').classList.toggle('hidden'); renderizarCarrinho(); }
-    function moveSlide(n) { const s = document.querySelectorAll(".carousel-item"); let a = 0; s.forEach((img, i) => { if(img.classList.contains('active')){ a = i; img.classList.remove('active'); }}); let next = (a + n + s.length) % s.length; s[next].classList.add('active'); }
+    
+    function moveSlide(n) { 
+        const s = document.querySelectorAll(".carousel-item"); 
+        let a = 0; 
+        s.forEach((img, i) => { if(img.classList.contains('active')){ a = i; img.classList.remove('active'); }}); 
+        let next = (a + n + s.length) % s.length; 
+        s[next].classList.add('active'); 
+    }
     setInterval(() => moveSlide(1), 5000);
 
     async function enviarWhatsApp() {
         if (!carrinho.length) return;
-        
         const entrega = document.getElementById('forma-entrega').value;
         const cep = document.getElementById('cep-destino').value;
-        
-        if (entrega === 'frete' && !cep) { 
-            alert("Informe o CEP para o frete!"); 
-            return; 
-        }
+        if (entrega === 'frete' && !cep) { alert("Informe o CEP!"); return; }
 
         const btn = document.getElementById('btn-finalizar');
         btn.innerText = "PROCESSANDO...";
         btn.disabled = true;
 
         try {
-            const dadosVenda = { 
-                itens: carrinho.map(i => ({ id: i.id, tamanho: i.tamanho, qtd: i.qtd })) 
-            };
-            
-            await fetch(URL_SCRIPT_ESTOQUE, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify(dadosVenda)
-            });
-        } catch (e) {
-            console.error("Erro ao atualizar estoque:", e);
-        }
+            const dadosVenda = { itens: carrinho.map(i => ({ id: i.id, tamanho: i.tamanho, qtd: i.qtd })) };
+            await fetch(URL_SCRIPT_ESTOQUE, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(dadosVenda) });
+        } catch (e) { console.error(e); }
 
         let qtdT = carrinho.reduce((s, i) => s + i.qtd, 0);
         let eAtacado = qtdT >= 4, totalF = 0, totalV = 0;
-        
         let msg = `🚀 *PEDIDO BRAZUKA 1.1*\n\n`;
         carrinho.forEach(i => {
             let p = eAtacado ? i.precoAtacado : i.precoVarejo;
@@ -355,22 +392,17 @@
         });
         
         msg += `\n📦 *Entrega:* ${entrega === 'retirar' ? 'Retirar no Local' : 'Enviar por Frete'}`;
-        
         if(entrega === 'frete') {
-            msg += `\n📍 *CEP:* ${cep}`;
-            msg += `\n\n⚠️ _Aguarde que informaremos o valor do frete!_`;
+            msg += `\n📍 *CEP:* ${cep}\n\n⚠️ _Aguarde que informaremos o valor do frete!_`;
         } else {
-            msg += `\n\n🕒 _Entraremos em contato para combinar o horário da retirada!_`;
+            msg += `\n\n🕒 _Entraremos em contato para combinar a retirada!_`;
         }
         
         msg += `\n\n💰 *Total: R$ ${totalF.toFixed(2)}*\n🎁 Economia: R$ ${(totalV-totalF).toFixed(2)}`;
-        
         window.open(`https://wa.me/5521986285970?text=${encodeURIComponent(msg)}`);
         
-        alert("Pedido enviado! O estoque será atualizado.");
-        setTimeout(() => {
-            location.reload();
-        }, 1000);
+        alert("Pedido enviado!");
+        setTimeout(() => { location.reload(); }, 1000);
     }
 
     carregarProdutos();
