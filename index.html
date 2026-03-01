@@ -79,23 +79,20 @@
                 <div class="flex gap-2">
                     <input type="text" id="cep-destino" placeholder="00000-000" class="cep-input" maxlength="9">
                 </div>
-                <p class="text-[9px] text-gray-400 mt-1">*Calcularemos o melhor frete após o envio do pedido.</p>
+                <p class="text-[9px] text-gray-400 mt-1">*Cálculo do frete após o envio do pedido.</p>
             </div>
 
             <div class="p-4 bg-gray-50">
+                <div id="aviso-atacado" class="text-[10px] text-center font-bold text-yellow-700 mb-2 hidden">🔥 ATACADO APLICADO (Mín. 4 un.)</div>
                 <div class="flex justify-between text-xs text-gray-500 mb-1">
-                    <span>Subtotal:</span>
+                    <span>Total Pedido:</span>
                     <span id="subtotal-value">R$ 0,00</span>
                 </div>
-                <div id="pix-discount-row" class="flex justify-between text-xs text-green-600 font-bold mb-2 hidden">
-                    <span>Desconto PIX (10%):</span>
-                    <span id="pix-discount-value">- R$ 0,00</span>
-                </div>
                 <div class="flex justify-between font-black text-lg mb-4 border-t pt-2">
-                    <span>TOTAL (sem frete):</span>
+                    <span>TOTAL:</span>
                     <span id="cart-total-value">R$ 0,00</span>
                 </div>
-                <button id="btn-finalizar" onclick="enviarWhatsApp()" class="w-full bg-[#28a745] text-white py-4 rounded font-black uppercase text-sm shadow-lg disabled:bg-gray-400">Enviar Pedido para Orçamento</button>
+                <button id="btn-finalizar" onclick="enviarWhatsApp()" class="w-full bg-[#28a745] text-white py-4 rounded font-black uppercase text-sm shadow-lg">Enviar Pedido no WhatsApp</button>
             </div>
         </div>
     </div>
@@ -159,17 +156,25 @@
 
     function renderizarCarrinho() {
         const lista = document.getElementById('cart-items-list');
-        let subtotal = 0;
+        const avisoAtacado = document.getElementById('aviso-atacado');
+        let totalFinal = 0;
+        let qtdTotal = carrinho.reduce((s, i) => s + i.qtd, 0);
+        let eAtacado = qtdTotal >= 4;
+
         lista.innerHTML = carrinho.length === 0 ? '<p class="text-center text-gray-400 mt-10">Carrinho vazio</p>' : '';
         
         carrinho.forEach((item, index) => {
-            subtotal += item.preco * item.qtd;
+            // Define o preço com base na quantidade total do carrinho [cite: 2026-03-01]
+            let precoUnitario = eAtacado ? item.precoAtacado : item.precoVarejo;
+            let subtotalItem = precoUnitario * item.qtd;
+            totalFinal += subtotalItem;
+
             lista.innerHTML += `
                 <div class="flex justify-between items-center border-b pb-4">
                     <div class="flex-1">
                         <p class="font-black text-[11px] uppercase">${item.nome}</p>
                         <p class="text-red-600 text-[10px] font-bold">TAM: ${item.tamanho}</p>
-                        <p class="text-gray-500 text-[11px]">R$ ${item.preco.toFixed(2)} un.</p>
+                        <p class="text-gray-500 text-[11px]">R$ ${precoUnitario.toFixed(2)} un. ${eAtacado ? '(Atacado)' : ''}</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <button onclick="alterarQtd(${index}, -1)" class="px-2 bg-gray-200">-</button>
@@ -179,17 +184,11 @@
                 </div>`;
         });
 
-        const descontoPix = subtotal * 0.10;
-        document.getElementById('subtotal-value').innerText = `R$ ${subtotal.toFixed(2)}`;
-        
-        if (subtotal > 0) {
-            document.getElementById('pix-discount-row').classList.remove('hidden');
-            document.getElementById('pix-discount-value').innerText = `- R$ ${descontoPix.toFixed(2)}`;
-            document.getElementById('cart-total-value').innerText = `R$ ${subtotal.toFixed(2)}`;
-        } else {
-            document.getElementById('pix-discount-row').classList.add('hidden');
-            document.getElementById('cart-total-value').innerText = `R$ 0,00`;
-        }
+        if (eAtacado) avisoAtacado.classList.remove('hidden');
+        else avisoAtacado.classList.add('hidden');
+
+        document.getElementById('subtotal-value').innerText = `R$ ${totalFinal.toFixed(2)}`;
+        document.getElementById('cart-total-value').innerText = `R$ ${totalFinal.toFixed(2)}`;
     }
 
     function selecionarTamanho(botao, id) {
@@ -203,8 +202,19 @@
         const tam = selecoesTemporarias[id];
         if (!tam) { alert("Selecione o tamanho!"); return; }
         const idx = carrinho.findIndex(i => i.id === id && i.tamanho === tam);
-        if (idx !== -1) carrinho[idx].qtd++;
-        else carrinho.push({ id, nome: prod.nome, tamanho: tam, preco: prod.preco, qtd: 1 });
+        
+        if (idx !== -1) {
+            carrinho[idx].qtd++;
+        } else {
+            carrinho.push({ 
+                id, 
+                nome: prod.nome, 
+                tamanho: tam, 
+                precoVarejo: prod.preco, 
+                precoAtacado: prod.atacado, 
+                qtd: 1 
+            });
+        }
         atualizarContador();
         alert("Adicionado!");
     }
@@ -221,19 +231,24 @@
         const cepInformado = document.getElementById('cep-destino').value;
         if (!cepInformado) { alert("Por favor, informe seu CEP para o cálculo do frete."); return; }
 
-        let subtotal = carrinho.reduce((s, i) => s + (i.preco * i.qtd), 0);
-        let totalPix = (subtotal * 0.9);
+        let qtdTotal = carrinho.reduce((s, i) => s + i.qtd, 0);
+        let eAtacado = qtdTotal >= 4;
+        let totalFinal = 0;
         
         let msg = "🚀 *NOVO PEDIDO - BRAZUKA 1.1*\n\n";
-        msg += "--- *ITENS* ---\n";
-        carrinho.forEach((item, i) => msg += `✅ ${item.qtd}x ${item.nome} (TAM: ${item.tamanho})\n`);
+        msg += eAtacado ? "🔥 *MODO ATACADO ATIVADO* 🔥\n\n" : "🛒 *MODO VAREJO*\n\n";
         
-        msg += `\n--- *VALORES* ---`;
-        msg += `\n💰 Subtotal Camisas: R$ ${subtotal.toFixed(2)}`;
-        msg += `\n🔥 *PAGANDO NO PIX (10% OFF): R$ ${totalPix.toFixed(2)}*`;
-        msg += `\n\n--- *DADOS DE ENTREGA* ---`;
-        msg += `\n📍 *CEP:* ${cepInformado}`;
-        msg += `\n\n⚠️ _Aguardando cálculo do frete para fechar o pedido._`;
+        msg += "--- *ITENS* ---\n";
+        carrinho.forEach((item, i) => {
+            let precoUnit = eAtacado ? item.precoAtacado : item.precoVarejo;
+            totalFinal += precoUnit * item.qtd;
+            msg += `✅ ${item.qtd}x ${item.nome} (TAM: ${item.tamanho}) - R$ ${precoUnit.toFixed(2)} un.\n`;
+        });
+        
+        msg += `\n--- *TOTAL DO PEDIDO* ---`;
+        msg += `\n💰 Valor Total: R$ ${totalFinal.toFixed(2)}`;
+        msg += `\n📍 *CEP de Entrega:* ${cepInformado}`;
+        msg += `\n\n⚠️ _Por favor, me informe o valor do frete para eu finalizar o pagamento!_`;
         
         window.open(`https://wa.me/5521986285970?text=${encodeURIComponent(msg)}`, '_blank');
     }
