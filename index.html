@@ -9,13 +9,20 @@
     <style>
         body { background-color: #000; font-family: sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         .site-container { background-color: #f3f3f3; max-width: 500px; margin: 0 auto; min-height: 100vh; position: relative; padding-bottom: 20px; }
+        
+        /* BANNER & HEADER */
         .banner-header { width: 100%; height: 130px; overflow: hidden; position: relative; background-color: #000; display: flex; align-items: center; justify-content: center; }
         .banner-img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.2); object-position: center; }
+        
+        /* MENU LATERAL */
         .side-menu { position: fixed; top: 0; left: -100%; width: 80%; max-width: 300px; height: 100%; background-color: #111; z-index: 200; transition: 0.4s; padding-top: 20px; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
         .side-menu.active { left: 0; }
         .side-menu a { display: block; padding: 15px 25px; color: #fff; text-transform: uppercase; font-size: 13px; font-weight: bold; border-bottom: 1px solid #222; text-decoration: none; cursor: pointer; }
+        .side-menu a:active { background-color: #bf953f; color: #000; }
         .overlay-menu { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 150; }
         .btn-menu-trigger { position: absolute; left: 15px; top: 15px; color: #fff; font-size: 22px; cursor: pointer; z-index: 60; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 5px; }
+
+        /* CARROSSEL & CARDS */
         .carousel { position: relative; width: 100%; height: 300px; overflow: hidden; background-color: #000; }
         .carousel-item { display: none; width: 100%; height: 100%; object-fit: cover; }
         .carousel-item.active { display: block; }
@@ -23,17 +30,27 @@
         .price-main { color: #333; font-size: 1.2rem; font-weight: 800; }
         .atacado-box { border-top: 1px solid #d4af37; border-bottom: 1px solid #d4af37; width: 90%; margin: 5px 0; text-align: center; padding: 2px 0; }
         .btn-dourado { background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c); color: #000; border: none; font-weight: 900; transition: 0.3s; cursor: pointer; }
+        
+        /* TAMANHOS */
         .size-box { border: 1px solid #333; width: 28px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; cursor: pointer; background: white; color: black; }
         .size-selected { background-color: #000 !important; color: #fff !important; }
         .size-off { border: 1px solid #ddd !important; color: #ccc !important; position: relative; cursor: not-allowed !important; pointer-events: none; }
         .size-off::after { content: ""; position: absolute; width: 100%; height: 1px; background: #ccc; transform: rotate(-45deg); }
+        
+        /* INPUTS */
+        .cep-input, .search-input, .select-input { border: 1px solid #ccc; padding: 8px; border-radius: 4px; width: 100%; font-size: 14px; outline: none; background: white; }
+        
+        /* MODAIS */
         .modal-galeria { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 300; display: none; align-items: center; justify-content: center; }
         .modal-galeria.active { display: flex; }
         .galeria-content { width: 90%; max-width: 450px; position: relative; }
-        .galeria-img { width: 100%; border-radius: 8px; max-height: 80vh; object-fit: contain; }
+        .galeria-img { width: 100%; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); max-height: 80vh; object-fit: contain; }
+        .galeria-nav { position: absolute; top: 50%; width: 100%; display: flex; justify-content: space-between; transform: translateY(-50%); pointer-events: none; }
+        .btn-nav-galeria { background: rgba(0,0,0,0.6); color: white; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; pointer-events: auto; font-size: 20px; border: 1px solid rgba(255,255,255,0.3); }
+
+        /* WHATSAPP FLUTUANTE */
         .btn-whatsapp-fixo { position: fixed; bottom: 20px; right: 20px; background-color: #25d366; color: #fff; width: 60px; height: 60px; border-radius: 50px; text-align: center; font-size: 30px; box-shadow: 2px 2px 10px rgba(0,0,0,0.3); z-index: 90; display: flex; align-items: center; justify-content: center; animation: pulse-green 2s infinite; text-decoration: none; }
         @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
-        .search-input { border: 1px solid #ccc; padding: 8px; border-radius: 4px; width: 100%; font-size: 14px; outline: none; }
     </style>
 </head>
 <body>
@@ -55,7 +72,7 @@
         <a href="https://wa.me/5521986285970" target="_blank">Contato / Suporte</a>
     </div>
 
-    <a href="https://wa.me/5521986285970" target="_blank" class="btn-whatsapp-fixo">
+    <a href="https://wa.me/5521986285970?text=Olá! Gostaria de tirar uma dúvida." target="_blank" class="btn-whatsapp-fixo">
         <i class="fab fa-whatsapp"></i>
     </a>
 
@@ -71,11 +88,11 @@
     </header>
 
     <div class="carousel">
-        <img src="banner1.jpg" class="carousel-item active">
-        <img src="banner2.jpg" class="carousel-item">
-        <img src="banner3.jpg" class="carousel-item">
-        <button onclick="moveSlide(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full">❮</button>
-        <button onclick="moveSlide(1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full">❯</button>
+        <img src="banner1.jpg" class="carousel-item active" alt="Promoção 1">
+        <img src="banner2.jpg" class="carousel-item" alt="Promoção 2">
+        <img src="banner3.jpg" class="carousel-item" alt="Promoção 3">
+        <button onclick="moveSlide(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full text-xs">❮</button>
+        <button onclick="moveSlide(1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full text-xs">❯</button>
     </div>
 
     <div class="p-3 bg-white border-b">
@@ -85,7 +102,7 @@
         </div>
     </div>
 
-    <h2 id="titulo-secao" class="bg-black text-white text-center py-2 text-sm font-bold uppercase border-t border-yellow-600">Lançamentos</h2>
+    <h2 id="titulo-secao" class="bg-black text-white text-center py-2 text-sm font-bold uppercase tracking-widest border-t border-yellow-600 shadow-md">Lançamentos</h2>
     
     <div id="grid-produtos" class="p-2 grid grid-cols-2 gap-2 text-black">
         <p class="text-center col-span-2 py-10">Carregando estoque...</p>
@@ -93,34 +110,59 @@
 
     <footer class="p-6 text-center text-gray-500 text-[10px] uppercase tracking-widest bg-white border-t mt-4">
         <p>© 2026 Brazuka 1.1 - Qualidade Tailandesa</p>
-        <button onclick="togglePolitica()" class="mt-2 text-yellow-600 font-bold underline">Ver Política de Trocas</button>
+        <button onclick="togglePolitica()" class="mt-2 text-yellow-600 font-bold underline cursor-pointer">Ver Política de Trocas</button>
     </footer>
 
     <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-60 z-[100] hidden">
         <div class="absolute right-0 top-0 h-full w-[90%] bg-white shadow-xl flex flex-col text-black">
             <div class="p-4 bg-[#333] text-white flex justify-between items-center">
-                <h2 class="font-bold uppercase italic">🛒 Meu Carrinho</h2>
+                <h2 class="font-bold uppercase tracking-tighter italic">🛒 Meu Carrinho</h2>
                 <button onclick="toggleCart()" class="text-3xl">&times;</button>
             </div>
-            <div id="cart-items-list" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
+            <div id="cart-items-list" class="flex-1 overflow-y-auto p-4 space-y-6"></div>
             
-            <div class="p-4 bg-gray-100 border-t">
-                <div class="mb-3">
-                    <label class="text-[10px] font-bold uppercase text-gray-500">Entrega:</label>
-                    <select id="forma-entrega" onchange="toggleCepInput()" class="w-full border p-2 rounded text-sm">
+            <div class="p-4 bg-gray-100 border-t border-b space-y-3">
+                <div>
+                    <label class="text-[10px] font-bold uppercase text-gray-500 mb-1 block">Como deseja receber?</label>
+                    <select id="forma-entrega" class="select-input" onchange="toggleCepInput()">
                         <option value="frete">Enviar para meu endereço</option>
                         <option value="retirar">Retirar no local</option>
                     </select>
                 </div>
-                <div id="campo-cep" class="mb-3">
-                    <input type="text" id="cep-destino" placeholder="Seu CEP" class="w-full border p-2 rounded text-sm">
+                <div id="campo-cep">
+                    <label class="text-[10px] font-bold uppercase text-gray-500 mb-1 block">Seu CEP:</label>
+                    <input type="text" id="cep-destino" placeholder="00000-000" class="cep-input" maxlength="9">
                 </div>
-                <div id="aviso-atacado" class="text-[10px] text-center font-bold text-green-700 hidden">🔥 ATACADO ATIVADO!</div>
-                <div class="flex justify-between font-black text-lg border-t pt-2">
+            </div>
+
+            <div class="p-4 bg-gray-50">
+                <div id="aviso-atacado" class="text-[10px] text-center font-bold text-green-700 mb-2 hidden">🔥 MODO ATACADO ATIVADO!</div>
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                    <span>Subtotal:</span>
+                    <span id="subtotal-value">R$ 0,00</span>
+                </div>
+                <div id="economia-row" class="flex justify-between text-xs text-green-600 font-bold mb-1 hidden">
+                    <span>Você economizou:</span>
+                    <span id="economia-value">R$ 0,00</span>
+                </div>
+                <div class="flex justify-between font-black text-lg mb-4 border-t pt-2">
                     <span>TOTAL:</span>
                     <span id="cart-total-value">R$ 0,00</span>
                 </div>
-                <button onclick="enviarWhatsApp()" class="w-full bg-[#28a745] text-white py-4 rounded font-black mt-4 uppercase text-sm">Finalizar Pedido</button>
+                
+                <button id="btn-finalizar" onclick="enviarWhatsApp()" class="w-full bg-[#28a745] text-white py-4 rounded font-black uppercase text-sm shadow-lg flex items-center justify-center gap-2">
+                    <i class="fab fa-whatsapp"></i> Finalizar Pedido
+                </button>
+
+                <div class="mt-4 flex flex-col items-center gap-2 opacity-70">
+                    <div class="flex gap-3 text-xl">
+                        <i class="fab fa-cc-visa"></i>
+                        <i class="fab fa-cc-mastercard"></i>
+                        <i class="fas fa-barcode"></i>
+                        <i class="fab fa-pix text-green-600"></i>
+                    </div>
+                    <span class="text-[9px] font-bold text-gray-600 uppercase">Pagamento Seguro via Link (Cartão ou Pix)</span>
+                </div>
             </div>
         </div>
     </div>
@@ -128,50 +170,63 @@
     <div id="modal-galeria" class="modal-galeria" onclick="fecharGaleria(event)">
         <div class="galeria-content">
             <img id="img-ampliada" src="" class="galeria-img">
+            <div id="nav-galeria" class="galeria-nav">
+                <button onclick="mudarFotoGaleria(-1)" class="btn-nav-galeria">❮</button>
+                <button onclick="mudarFotoGaleria(1)" class="btn-nav-galeria">❯</button>
+            </div>
             <button onclick="toggleGaleria()" class="absolute -top-12 right-0 text-white text-4xl">&times;</button>
         </div>
     </div>
 
     <div id="modal-politica" class="modal-galeria" onclick="fecharPolitica(event)">
         <div class="galeria-content">
-            <img src="politica-trocas.png" class="galeria-img">
+            <img src="politica-trocas.png" class="galeria-img" alt="Política de Trocas Brazuka 1.1">
             <button onclick="togglePolitica()" class="absolute -top-12 right-0 text-white text-4xl">&times;</button>
         </div>
     </div>
 </div>
 
 <script>
+    const URL_SCRIPT_ESTOQUE = "https://script.google.com/macros/s/AKfycbw07ch2ZqT7cPfs-3_rNcTo1MAzScrHSVueFeER4Zx6-qFy9KROi07qOjmRwysOzQiy/exec";
     const linkPlanilha = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR0m7HN1ePfdwVgr0aaFfYjjFv6r1zag8fZ4x5Ih8XKPLjEIe97nRHqU-hWKWfBEksbOH5Mw8u2Y6VZ/pub?output=csv";
+    
     let produtosData = [], carrinho = [], selecoesTemporarias = {};
-    let currentSlide = 0;
+    let fotosAtuais = [], fotoIndice = 0;
 
-    // --- FUNÇÕES DE INTERFACE ---
     function toggleMenu() {
-        document.getElementById('sideMenu').classList.toggle('active');
-        const overlay = document.getElementById('overlay');
-        overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        const m = document.getElementById('sideMenu');
+        const o = document.getElementById('overlay');
+        m.classList.toggle('active');
+        o.style.display = m.classList.contains('active') ? 'block' : 'none';
     }
 
-    function toggleCart() { document.getElementById('cart-modal').classList.toggle('hidden'); renderizarCarrinho(); }
-    function togglePolitica() { document.getElementById('modal-politica').classList.toggle('active'); }
-    function abrirPolitica() { toggleMenu(); togglePolitica(); }
-    function fecharPolitica(e) { if(e.target.id === 'modal-politica') togglePolitica(); }
-    function toggleGaleria() { document.getElementById('modal-galeria').classList.toggle('active'); }
-    function fecharGaleria(e) { if(e.target.id === 'modal-galeria') toggleGaleria(); }
+    // NOVAS FUNÇÕES PARA POLÍTICA
+    function togglePolitica() {
+        document.getElementById('modal-politica').classList.toggle('active');
+    }
 
-    function moveSlide(n) {
-        const slides = document.querySelectorAll('.carousel-item');
-        slides[currentSlide].classList.remove('active');
-        currentSlide = (currentSlide + n + slides.length) % slides.length;
-        slides[currentSlide].classList.add('active');
+    function abrirPolitica() {
+        toggleMenu(); // Fecha o menu lateral primeiro
+        togglePolitica(); // Abre o modal do banner
+    }
+
+    function fecharPolitica(e) {
+        if(e.target.id === 'modal-politica') togglePolitica();
     }
 
     function toggleCepInput() {
-        const campo = document.getElementById('campo-cep');
-        campo.style.display = document.getElementById('forma-entrega').value === 'retirar' ? 'none' : 'block';
+        const entrega = document.getElementById('forma-entrega').value;
+        const inputCep = document.getElementById('cep-destino');
+        if (entrega === 'retirar') {
+            inputCep.value = "";
+            inputCep.disabled = true;
+            inputCep.placeholder = "Não necessário p/ retirada";
+        } else {
+            inputCep.disabled = false;
+            inputCep.placeholder = "00000-000";
+        }
     }
 
-    // --- LÓGICA DE PRODUTOS ---
     async function carregarProdutos() {
         try {
             const r = await fetch(linkPlanilha);
@@ -185,45 +240,65 @@
                 const c = l.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
                 if(c.length < 5) return;
 
+                const imagemLimpa = c[4].replace(/["\r\n]/g, '').trim();
+
                 const p = {
                     id: c[0].replace(/"/g, '').trim(), 
                     nome: c[1].replace(/"/g, '').trim(), 
                     preco: parseFloat(c[2]), 
                     atacado: parseFloat(c[3]), 
-                    imagem: c[4].replace(/["\r\n]/g, '').split(',')[0].trim(),
+                    imagem: imagemLimpa,
                     estoque: { P: parseInt(c[5])||0, M: parseInt(c[6])||0, G: parseInt(c[7])||0, GG: parseInt(c[8])||0 },
                     categoria: c[9] ? c[9].replace(/"/g, '').trim().toLowerCase() : "todos"
                 };
                 produtosData.push(p);
+                
+                const fotosArray = p.imagem.split(',').map(f => f.trim()).filter(f => f !== "");
+                const primeiraFoto = fotosArray[0];
                 
                 let tams = "";
                 for (let tam in p.estoque) {
                     if (p.estoque[tam] > 0) tams += `<button onclick="selecionarTamanho(this, '${p.id}')" class="size-box">${tam}</button>`;
                     else tams += `<button class="size-box size-off">${tam}</button>`;
                 }
-
                 grid.innerHTML += `
                     <div class="card-artilheiro item-produto" data-nome="${p.nome.toLowerCase()}" data-cat="${p.categoria}" id="${p.id}">
-                        <img src="${p.imagem}" onclick="abrirGaleria('${p.imagem}')" class="w-full h-44 object-cover">
+                        <img src="${primeiraFoto}" onclick="abrirGaleria('${p.id}')" class="w-full h-44 object-cover cursor-zoom-in" onerror="this.src='https://via.placeholder.com/300?text=Link+Incorreto'">
                         <h3 class="text-[10px] px-2 h-8 text-center font-bold mt-1 uppercase">${p.nome}</h3>
                         <span class="price-main">R$ ${p.preco.toFixed(2)}</span>
-                        <div class="atacado-box"><span class="text-[8px] text-yellow-700 font-bold">ATACADO: R$ ${p.atacado.toFixed(2)}</span></div>
+                        <div class="atacado-box">
+                            <span class="text-[8px] text-yellow-700 font-bold uppercase">Atacado (4+ un): R$ ${p.atacado.toFixed(2)}</span>
+                        </div>
                         <div class="flex gap-1 my-2">${tams}</div>
                         <button onclick="adicionarAoCarrinho('${p.id}')" class="w-[90%] btn-dourado py-2 rounded text-[11px] uppercase">Comprar</button>
                     </div>`;
             });
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("Erro ao carregar planilha", e); }
     }
 
-    function abrirGaleria(src) {
-        document.getElementById('img-ampliada').src = src;
-        toggleGaleria();
+    function abrirGaleria(id) {
+        const p = produtosData.find(x => x.id === id);
+        if(!p) return;
+        fotosAtuais = p.imagem.split(',').map(f => f.trim()).filter(f => f !== "");
+        if (fotosAtuais.length === 0) return;
+        fotoIndice = 0;
+        document.getElementById('img-ampliada').src = fotosAtuais[0];
+        document.getElementById('modal-galeria').classList.add('active');
+        document.getElementById('nav-galeria').style.display = fotosAtuais.length > 1 ? 'flex' : 'none';
     }
 
-    function selecionarTamanho(btn, id) {
-        document.getElementById(id).querySelectorAll('.size-box').forEach(b => b.classList.remove('size-selected'));
-        btn.classList.add('size-selected');
-        selecoesTemporarias[id] = btn.innerText;
+    function mudarFotoGaleria(direcao) {
+        if(fotosAtuais.length <= 1) return;
+        fotoIndice = (fotoIndice + direcao + fotosAtuais.length) % fotosAtuais.length;
+        document.getElementById('img-ampliada').src = fotosAtuais[fotoIndice];
+    }
+
+    function fecharGaleria(e) {
+        if(e.target.id === 'modal-galeria') toggleGaleria();
+    }
+
+    function toggleGaleria() {
+        document.getElementById('modal-galeria').classList.toggle('active');
     }
 
     function buscarNoGrid() {
@@ -235,79 +310,106 @@
 
     function filtrarProdutos(cat) {
         toggleMenu();
-        document.getElementById('titulo-secao').innerText = cat === 'todos' ? "Lançamentos" : cat.toUpperCase();
+        const titulo = document.getElementById('titulo-secao');
+        const busca = document.getElementById('input-busca');
+        busca.value = "";
+        titulo.innerText = cat === 'todos' ? "Lançamentos" : cat.replace(/-/g, ' ').toUpperCase();
         document.querySelectorAll('.item-produto').forEach(p => {
-            p.style.display = (cat === 'todos' || p.getAttribute('data-cat') === cat) ? "flex" : "none";
+            const pCat = p.getAttribute('data-cat');
+            p.style.display = (cat === 'todos' || pCat === cat) ? "flex" : "none";
         });
     }
 
-    // --- LÓGICA DE CARRINHO ---
+    function selecionarTamanho(btn, id) {
+        document.getElementById(id).querySelectorAll('.size-box').forEach(b => b.classList.remove('size-selected'));
+        btn.classList.add('size-selected');
+        selecoesTemporarias[id] = btn.innerText;
+    }
+
     function adicionarAoCarrinho(id) {
         const p = produtosData.find(x => x.id === id);
         const t = selecoesTemporarias[id];
-        if (!t) { alert("Selecione um tamanho!"); return; }
-
-        const jaTem = carrinho.find(i => i.id === id && i.tamanho === t);
-        if (jaTem) jaTem.qtd++;
-        else carrinho.push({ ...p, tamanho: t, qtd: 1 });
-
+        if (!t) { alert("Escolha o tamanho!"); return; }
+        const jaTemIdx = carrinho.findIndex(i => i.id === id && i.tamanho === t);
+        if (jaTemIdx !== -1) {
+            carrinho[jaTemIdx].qtd++;
+        } else {
+            carrinho.push({ id, nome: p.nome, tamanho: t, precoVarejo: p.preco, precoAtacado: p.atacado, qtd: 1 });
+        }
         document.getElementById('cart-count').innerText = carrinho.reduce((s, i) => s + i.qtd, 0);
-        alert("Adicionado ao carrinho!");
+        alert("Adicionado!");
     }
 
     function renderizarCarrinho() {
         const lista = document.getElementById('cart-items-list');
         const aviso = document.getElementById('aviso-atacado');
-        let total = 0, qtdT = carrinho.reduce((s, i) => s + i.qtd, 0);
+        const ecoRow = document.getElementById('economia-row');
+        let totalF = 0, totalV = 0;
+        let qtdT = carrinho.reduce((s, i) => s + i.qtd, 0);
         let eAtacado = qtdT >= 4;
-
-        aviso.classList.toggle('hidden', !eAtacado);
-        lista.innerHTML = carrinho.length === 0 ? '<p class="text-center text-gray-400">Carrinho vazio</p>' : '';
-        
+        lista.innerHTML = carrinho.length === 0 ? '<p class="text-center text-gray-400 mt-10">Vazio</p>' : '';
         carrinho.forEach((item, idx) => {
-            let precoU = eAtacado ? item.atacado : item.preco;
-            total += precoU * item.qtd;
+            let precoU = eAtacado ? item.precoAtacado : item.precoVarejo;
+            totalF += precoU * item.qtd;
+            totalV += item.precoVarejo * item.qtd;
             lista.innerHTML += `
-                <div class="flex justify-between items-center border-b pb-2">
+                <div class="flex justify-between items-center border-b pb-2 text-black">
                     <div class="text-[11px]">
                         <p class="font-bold uppercase">${item.nome}</p>
-                        <p class="text-red-600 font-bold">${item.tamanho} - R$ ${precoU.toFixed(2)}</p>
+                        <p class="text-red-600 font-bold">TAM: ${item.tamanho} | R$ ${precoU.toFixed(2)}</p>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="alterarQtd(${idx},-1)" class="bg-gray-200 px-2 rounded">-</button>
-                        <span class="font-bold">${item.qtd}</span>
-                        <button onclick="alterarQtd(${idx},1)" class="bg-gray-200 px-2 rounded">+</button>
+                        <button onclick="alterarQtd(${idx},-1)" class="bg-gray-200 px-2">-</button>
+                        <span>${item.qtd}</span>
+                        <button onclick="alterarQtd(${idx},1)" class="bg-gray-200 px-2">+</button>
                     </div>
                 </div>`;
         });
-        document.getElementById('cart-total-value').innerText = `R$ ${total.toFixed(2)}`;
+        let eco = totalV - totalF;
+        if (eAtacado && eco > 0) { aviso.classList.remove('hidden'); ecoRow.classList.remove('hidden'); document.getElementById('economia-value').innerText = `R$ ${eco.toFixed(2)}`; }
+        else { aviso.classList.add('hidden'); ecoRow.classList.add('hidden'); }
+        document.getElementById('subtotal-value').innerText = `R$ ${totalF.toFixed(2)}`;
+        document.getElementById('cart-total-value').innerText = `R$ ${totalF.toFixed(2)}`;
     }
 
-    function alterarQtd(idx, n) {
-        carrinho[idx].qtd += n;
-        if (carrinho[idx].qtd <= 0) carrinho.splice(idx, 1);
-        document.getElementById('cart-count').innerText = carrinho.reduce((s, i) => s + i.qtd, 0);
-        renderizarCarrinho();
+    function alterarQtd(i, d) { 
+        carrinho[i].qtd += d; 
+        if(carrinho[i].qtd <= 0) carrinho.splice(i,1); 
+        renderizarCarrinho(); 
+        document.getElementById('cart-count').innerText = carrinho.reduce((s, i) => s + i.qtd, 0); 
     }
 
-    function enviarWhatsApp() {
-        if (carrinho.length === 0) return;
+    function toggleCart() { document.getElementById('cart-modal').classList.toggle('hidden'); renderizarCarrinho(); }
+    
+    function moveSlide(n) { 
+        const s = document.querySelectorAll(".carousel-item"); 
+        let a = 0; 
+        s.forEach((img, i) => { if(img.classList.contains('active')){ a = i; img.classList.remove('active'); }}); 
+        let next = (a + n + s.length) % s.length; 
+        s[next].classList.add('active'); 
+    }
+    
+    setInterval(() => moveSlide(1), 5000);
+
+    async function enviarWhatsApp() {
+        if (!carrinho.length) return;
         const entrega = document.getElementById('forma-entrega').value;
         const cep = document.getElementById('cep-destino').value;
-        let msg = `*NOVO PEDIDO - BRAZUKA 1.1*%0A%0A`;
+        if (entrega === 'frete' && !cep) { alert("Informe o CEP!"); return; }
         
         let qtdT = carrinho.reduce((s, i) => s + i.qtd, 0);
-        let eAtacado = qtdT >= 4;
-
+        let eAtacado = qtdT >= 4, totalF = 0;
+        let msg = `🚀 *PEDIDO BRAZUKA 1.1*\n\n`;
         carrinho.forEach(i => {
-            let pU = eAtacado ? i.atacado : i.preco;
-            msg += `• ${i.nome} (${i.tamanho}) x${i.qtd} - R$ ${(pU*i.qtd).toFixed(2)}%0A`;
+            let p = eAtacado ? i.precoAtacado : i.precoVarejo;
+            totalF += p * i.qtd;
+            msg += `✅ ${i.qtd}x ${i.nome} (${i.tamanho}) - R$ ${p.toFixed(2)}\n`;
         });
-
-        msg += `%0A*Total: ${document.getElementById('cart-total-value').innerText}*`;
-        msg += `%0A*Entrega:* ${entrega === 'retirar' ? 'Retirada no local' : 'Enviar para CEP: ' + cep}`;
+        msg += `\n📦 *Entrega:* ${entrega === 'retirar' ? 'Retirar no Local' : 'Enviar por Frete (CEP: '+cep+')'}`;
+        msg += `\n💰 *Total: R$ ${totalF.toFixed(2)}*`;
+        msg += `\n\n💳 *Pagamento via:* ( ) Pix  ( ) Cartão de Crédito`;
         
-        window.open(`https://wa.me/5521986285970?text=${msg}`);
+        window.open(`https://wa.me/5521986285970?text=${encodeURIComponent(msg)}`);
     }
 
     carregarProdutos();
